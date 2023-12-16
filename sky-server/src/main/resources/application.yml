@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev
+    active: dev # 将application-dev.yml中的配置激活, 在那个配置中的配置的是与数据库进行连接的相关配置, 以及使用的mysql驱动, 这里使用的是drive-class-name属性进行指定
   main:
     allow-circular-references: true
   datasource:

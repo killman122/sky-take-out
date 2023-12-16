@@ -1,6 +1,7 @@
 package com.sky.config;
 
 import com.sky.interceptor.JwtTokenAdminInterceptor;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +44,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      */
     @Bean
     public Docket docket() {
+        //log.info("准备生成接口文档...");
         ApiInfo apiInfo = new ApiInfoBuilder()
                 .title("苍穹外卖项目接口文档")
                 .version("2.0")
@@ -51,17 +53,19 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.sky.controller"))
+                //指定生成接口需要扫描的包
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller"))//解析指定的包, 一般是解析controller层, 并且将controller层的所有方法都解析出来, 在网页中查看接口文档的时候, 可以看到controller层中的所有方法
                 .paths(PathSelectors.any())
                 .build();
         return docket;
     }
 
     /**
-     * 设置静态资源映射
+     * 设置静态资源映射, 并且由于config配置类继承于WebMvcConfigurationSupport类, 所以需要重写addResourceHandlers方法
      * @param registry
      */
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        log.info("开始设置静态资源映射...");
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }

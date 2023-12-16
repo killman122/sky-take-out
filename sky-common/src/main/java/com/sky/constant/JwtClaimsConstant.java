@@ -1,6 +1,6 @@
 package com.sky.constant;
 
-public class JwtClaimsConstant {
+public class JwtClaimsConstant {//JWT令牌中的载荷信息的常量类
 
     public static final String EMP_ID = "empId";
     public static final String USER_ID = "userId";
