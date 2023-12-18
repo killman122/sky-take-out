@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.EmployeeMapper">
-
     <!--使用分页查询实现对不同页和设定每页中指定的行数-->
     <!--在这里进行查询的时候使用mysql中的函数concat()进行连接%后实现模糊查询-->
     <select id="pageQuery" resultType="com.sky.entity.Employee">
@@ -15,4 +14,45 @@
         </where>
         order by create_time desc <!--从数据库中获取过来的数据而不是从实体中直接得到的数据-->
     </select>
+
+    <update id="update" parameterType="Employee">
+        <!--由于在mapper配置文件中整体进行了扫描 type-aliases-package, 所以可以不写完整包名, 只填写最后一个类名-->
+        <!--#{}中的变量是数据库中表对应的Java中的实体类, 需要使用驼峰式命名, 在赋值的时候需要将实体属性的名称赋值给数据库中的键-->
+        <!--注意在使用mybatis的时候使用的el表达式是类似于#{},${}不能防止sql注入-->
+        <!--另外注意在使用标签进行sql的编写时, 如果在条件中判null又判' '则可能会导致失去了语法错误, 需要注意-->
+        update employee
+        <set>
+            <if test="name != null">
+                name = #{name},    <!--这里的name是数据库中的键, #{name}是实体类中的属性-->
+            </if>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="idNumber != null">
+                id_number = #{idNumber},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </set>
+        <!--where id = #{id}-->
+        <where>
+            id = #{id}
+        </where>
+    </update>
 </mapper>

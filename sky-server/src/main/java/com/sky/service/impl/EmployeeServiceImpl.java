@@ -142,4 +142,45 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(total, records);//将总记录数和当前页数据集合封装到PageResult对象中, 然后返回PageResult对象
     }
 
+    /**
+     * 启用禁用员工账号
+     * <p>
+     * 实际上对应的sql语句类似于 update employer1 from employee set status = #{status} where id = #{id}
+     * <p>
+     * update employee from employee set status = ? where id = ?
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        //创建一个空的实体对象, 这里使用无参构造器后调用set方法设置属性, 如果使用有参构造器会由于参数不足产生问题
+        /*Employee employee = new Employee();
+        employee.setStatus(status);
+        employee.setId(id);*/
+
+        //通过构建器创建对象, 由于实体类已经使用lombok注解开发, 并在实体类上使用@Builder注解, 所以可以使用构建器创建对象
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+
+
+        employeeMapper.update(employee);
+
+        /*//根据id查询员工信息
+        Employee employee = employeeMapper.getById(id);
+
+        //判断员工信息是否存在
+        if (employee == null) {
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+
+        //判断员工账号是否被锁定
+        if (employee.getStatus() == StatusConstant.DISABLE) {
+            throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
+        }
+
+        //修改员工账号状态
+        employeeMapper.updateStatus(status, id);*/
+    }
 }

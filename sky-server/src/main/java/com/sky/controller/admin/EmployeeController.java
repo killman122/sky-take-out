@@ -12,7 +12,6 @@ import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,9 +107,9 @@ public class EmployeeController {
 
     /**
      * 按页查询员工信息, 员工分页查询
+     *
      * @param employeePageQueryDTO
-     * @return
-     * <p>
+     * @return <p>
      * 使用get请求的方式进行查询, 所以在Spring中使用@GetMapping注解, 并且查询中传入的是请求参数Query而不是json数据用作查询的请求体, 所以在传入的参数中也不需要使用@RequestBody注解
      * Controller层调用Service接口, Service接口调用Mapper接口, Mapper接口调用Mapper.xml配置文件, Mapper.xml配置文件中使用sql语句进行查询
      */
@@ -120,5 +119,26 @@ public class EmployeeController {
         log.info("员工分页查询：参数为{}", employeePageQueryDTO);
         PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 启用或禁用员工
+     * <p>
+     * 对于查询的请求方法, 在使用的时候需要加上泛型的限定, 对于非查询类的请求, 在构造方法的时候是不需要加上泛型的限定的
+     * 传入的参数有两个, 一个参数是路径参数path, 也就是描述当前请求的status, 另一个参数是请求参数Query, 也就是描述当前请求的查询参数(员工id)
+     * 由于请求方式是Post请求方式, 所以需要在方法前加入一个@PostMapping注解, 由于请求参数是一个路径参数, 所以需要在参数前加入一个@PathVariable注解, 由于请求参数是一个查询参数, 所以需要在参数前加入一个@RequestBody注解
+     * 使用{}来接收路径参数, 使用@PathVariable注解来接收路径参数@PathVariable("status") Integer status, 使用@RequestBody注解来接收查询参数
+     * 如果路径参数和Mapping注解中的参数一致, 那么就不需要在@PathVariable注解中添加参数, 如果不一致, 那么就需要在@PathVariable注解中添加参数
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用或禁用员工账号")
+    //public Result startOrStop(@PathVariable Integer status, Long id) {//注意在使用路径参数的时候需要在参数前加一个路径变量的注解
+    public Result startOrStop(@PathVariable("status") Integer status, Long id) {//注意在使用路径参数的时候需要在参数前加一个路径变量的注解
+        log.info("启用或禁用员工账号：status={}, id={}", status, id);
+        employeeService.startOrStop(status, id);
+        return Result.success();
     }
 }

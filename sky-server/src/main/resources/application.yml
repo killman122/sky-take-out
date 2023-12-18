@@ -16,6 +16,7 @@ spring:
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
+  #开启包扫描, 开启后可以不使用完整包名只使用最后的包名也就是类名
   type-aliases-package: com.sky.entity
   configuration:
     #开启驼峰命名

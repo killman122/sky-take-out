@@ -40,4 +40,11 @@ public interface EmployeeMapper {
      * 这里的sql使用的是动态SQL, 直接使用注解进行查询是不方便的, 所以这里使用xml配置文件的方式进行查询
      */
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * 根据主键动态修改属性值
+     * 由于是动态sql, 所以这里使用的是xml配置文件的方式
+     * @param employee
+     */
+    void update(Employee employee);
 }
