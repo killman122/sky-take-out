@@ -2,4 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.EmployeeMapper">
+
+    <!--使用分页查询实现对不同页和设定每页中指定的行数-->
+    <!--在这里进行查询的时候使用mysql中的函数concat()进行连接%后实现模糊查询-->
+    <select id="pageQuery" resultType="com.sky.entity.Employee">
+        select *
+        from employee
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+        </where>
+        order by create_time desc <!--从数据库中获取过来的数据而不是从实体中直接得到的数据-->
+    </select>
 </mapper>

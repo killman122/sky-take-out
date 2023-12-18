@@ -1,15 +1,19 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.sky.constant.PasswordConstant.DEFAULT_PASSWORD;
 
@@ -111,6 +116,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         //调用注入(自动装配的)持久层mapper将数据保存到数据库中
         employeeMapper.insert(employee);
 
+    }
+
+    /**
+     * 分页查询员工列表
+     * 由于@Override注解只是用作检查, 在这里将@Override注解注释掉
+     * 使用mybatis中的分页插件pageHelper, 防止由于手动计算分页任务时出现的错误, 比如说, 当前页码小于1时, 将当前页码设置为1, 当前页码大于总页数时, 将当前页码设置为总页数, 这些错误都是可以通过使用mybatis中的分页插件pageHelper来避免的
+     * 使用PageHelper插件的方式是: 在需要分页的查询方法中, 使用PageHelper.startPage()方法, 这个方法需要传入两个参数, 第一个参数是当前页码, 第二个参数是每页显示记录数, 这两个参数都是从前端传递过来的, 所以需要在controller层中接收前端传递过来的参数, 然后将参数传递到service层, 然后在service层中将参数传递到mapper层, 然后在mapper层中使用PageHelper.startPage()方法, 这样就可以实现分页查询了
+     * PageHelper插件的返回值是Page<E>类型, 这个类型是PageHelper插件中的一个泛型类, 这个类中封装了分页查询的结果, 这个类中有两个属性, 一个是total属性, 一个是records属性, total属性表示总记录数, records属性表示当前页数据集合
+     * 插件中结果限定的泛型填写的是实体类(和库中数据存在映射关系), 这里的实体类是Employee, 所以这里的返回值类型是Page<Employee>
+     *
+     * @param employeePageQueryDTO
+     * @return
+     */
+    @Override
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        //使用mybatis的分页插件进行分页查询
+        //开始分页查询, 需要传入两个参数, 第一个参数是当前页码, 第二个参数是每页显示记录数
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
+
+        //对Page对象进行处理, 将返回的page对象转换为PageResult对象
+        long total = page.getTotal();//获取总记录数
+        List<Employee> records = page.getResult();//获取当前页数据集合
+        return new PageResult(total, records);//将总记录数和当前页数据集合封装到PageResult对象中, 然后返回PageResult对象
     }
 
 }

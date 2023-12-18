@@ -1,5 +1,6 @@
 package com.sky.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +33,7 @@ public class Employee implements Serializable {
 
     private Integer status;
 
+    //第一种方式处理格式化时间字符串, 这里使用的是@JsonFormat注解, 这里的pattern属性就是格式化时间字符串的格式
     //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 

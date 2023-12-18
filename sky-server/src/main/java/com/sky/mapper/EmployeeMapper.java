@@ -1,5 +1,7 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -29,4 +31,13 @@ public interface EmployeeMapper {
             "values " +
             "(#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{status},#{createTime},#{updateTime},#{createUser},#{updateUser})")
     void insert(Employee employee);//这里对于mybatis的配置可以使用注解的方式也可以使用xml, 使用xml直接通过alt+insert进行填充即可
+
+    /**
+     * 分页查询员工列表
+     * @param employeePageQueryDTO
+     * @return
+     * <p>
+     * 这里的sql使用的是动态SQL, 直接使用注解进行查询是不方便的, 所以这里使用xml配置文件的方式进行查询
+     */
+    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 }

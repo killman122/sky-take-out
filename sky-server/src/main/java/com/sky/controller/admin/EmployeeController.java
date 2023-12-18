@@ -3,8 +3,10 @@ package com.sky.controller.admin;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
@@ -14,10 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -105,5 +104,21 @@ public class EmployeeController {
         log.info("新增员工：{}", employeeDTO);//使用占位符{}, 将逗号后的参数动态的添加到占位符中
         employeeService.save(employeeDTO);
         return Result.success();
+    }
+
+    /**
+     * 按页查询员工信息, 员工分页查询
+     * @param employeePageQueryDTO
+     * @return
+     * <p>
+     * 使用get请求的方式进行查询, 所以在Spring中使用@GetMapping注解, 并且查询中传入的是请求参数Query而不是json数据用作查询的请求体, 所以在传入的参数中也不需要使用@RequestBody注解
+     * Controller层调用Service接口, Service接口调用Mapper接口, Mapper接口调用Mapper.xml配置文件, Mapper.xml配置文件中使用sql语句进行查询
+     */
+    @GetMapping("/page")
+    @ApiOperation("员工分页查询")
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
+        log.info("员工分页查询：参数为{}", employeePageQueryDTO);
+        PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(pageResult);
     }
 }
