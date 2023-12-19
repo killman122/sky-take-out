@@ -183,4 +183,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         //修改员工账号状态
         employeeMapper.updateStatus(status, id);*/
     }
+
+    @Override
+    public Employee getById(Long id) {
+        //从service层的实现类中调用持久层的mapper接口中的方法, 将数据从数据库中查询出来, 然后返回给controller层
+        return employeeMapper.getById(id);
+    }
+
+    /**
+     * 编辑更新员工信息
+     * 在实现编辑更新员工信息中, 实际上已经在进入编辑前就判断力员工是否存在,员工信息是否被锁定的情况, 所以在这里不需要再次判断员工信息是否存在, 员工信息是否被锁定
+     * @param employeeDTO
+     */
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        //从service层的实现类中调用持久层的mapper接口中的方法, 将数据从数据库中查询出来, 然后返回给controller层
+        Employee employee = employeeMapper.getById(employeeDTO.getId());
+
+        //判断员工信息是否存在
+        if (employee == null) {
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+
+        //判断员工账号是否被锁定
+        if (employee.getStatus() == StatusConstant.DISABLE) {
+            throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
+        }
+
+        //将DTO中的数据拷贝到实体类中
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        //设置修改时间
+        employee.setUpdateTime(LocalDateTime.now());
+
+        //设置修改人
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        //调用持久层的mapper接口中的方法, 将数据保存到数据库中
+        employeeMapper.update(employee);
+    }
 }
