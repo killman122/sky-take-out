@@ -1,8 +1,10 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.annotation.AutoFill;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
+import com.sky.enumeration.OperationType;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -30,6 +32,7 @@ public interface EmployeeMapper {
     @Insert("insert into employee(name, username, password, phone, sex, id_number, status, create_time, update_time, create_user, update_user)" +
             "values " +
             "(#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{status},#{createTime},#{updateTime},#{createUser},#{updateUser})")
+        @AutoFill(value = OperationType.INSERT)//实现公共字段自动填充, 这里填充的字段也是枚举类型
     void insert(Employee employee);//这里对于mybatis的配置可以使用注解的方式也可以使用xml, 使用xml直接通过alt+insert进行填充即可
 
     /**
@@ -46,6 +49,7 @@ public interface EmployeeMapper {
      * 由于是动态sql, 所以这里使用的是xml配置文件的方式
      * @param employee
      */
+    @AutoFill(value = OperationType.UPDATE)//实现公共字段自动填充, 这里填充的字段也是枚举类型
     void update(Employee employee);
 
     /**

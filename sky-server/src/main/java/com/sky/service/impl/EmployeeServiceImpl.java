@@ -103,15 +103,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPassword(DigestUtils.md5DigestAsHex(DEFAULT_PASSWORD.getBytes()));
 
         //设置当前记录的创建时间和修改时间, 这里的创建时间和修改时间都是当前时间, 所以可以直接使用new Date()获取当前系统时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
 
         //设置当前记录的创建人和修改人, 这里的创建人和修改人都是当前登录的用户, 所以可以直接使用SecurityUtil工具类中的getLoginUser()方法获取当前登录的用户
         //employee.setCreateUser(10L);
         //从JwtTokenAdminInterceptor拦截器中获取当前登录用户的id并存储到ThreadLocal中, 这里的ThreadLocal是一个线程安全的容器, 用来存储当前线程中的数据, 这里的ThreadLocal中的数据只能在当前线程中获取, 不能跨线程获取, 这里的ThreadLocal中的数据是线程隔离的, 也就是说, 当前线程中的数据不能被其他线程获取, 这里的ThreadLocal中的数据是线程共享的, 也就是说, 当前线程中的数据可以被当前线程中的其他方法获取, 这里的ThreadLocal中的数据是线程独立的, 也就是说, 当前线程中的数据不能被其他线程修改, 这里的ThreadLocal中的数据是线程共享的, 也就是说, 当前线程中的数据可以被当前线程中的其他方法修改
-        employee.setCreateUser(BaseContext.getCurrentId());//service层通过调用去除相关的雇员id
+        //employee.setCreateUser(BaseContext.getCurrentId());//service层通过调用去除相关的雇员id
         //employee.setUpdateUser(10L);
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        //employee.setUpdateUser(BaseContext.getCurrentId());
 
         //调用注入(自动装配的)持久层mapper将数据保存到数据库中
         employeeMapper.insert(employee);
@@ -214,10 +214,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         BeanUtils.copyProperties(employeeDTO, employee);
 
         //设置修改时间
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
 
         //设置修改人
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        //employee.setUpdateUser(BaseContext.getCurrentId());
 
         //调用持久层的mapper接口中的方法, 将数据保存到数据库中
         employeeMapper.update(employee);
