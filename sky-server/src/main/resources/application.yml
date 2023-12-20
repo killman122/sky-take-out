@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev # 将application-dev.yml中的配置激活, 在那个配置中的配置的是与数据库进行连接的相关配置, 以及使用的mysql驱动, 这里使用的是drive-class-name属性进行指定
+    active: dev # 将application-dev.yml中的配置激活, 在那个配置中的配置的是与数据库进行连接的相关配置, 以及使用的mysql驱动, 这里使用的是drive-class-name属性进行指定, 在配置阿里OSS的使用使用的也是dev环境下的配置
   main:
     allow-circular-references: true
   datasource:
@@ -38,3 +38,9 @@ sky:
     admin-ttl: 7200000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+  # 自定义属性,在配置属性类AliOssProperties使用注解@ConfigurationProperties(prefix = "sky.ali-oss")进行注入
+  alioss:
+    endpoint: ${sky.alioss.endpoint}
+    access-key-id: ${sky.alioss.access-key-id}
+    access-key-secret: ${sky.alioss.access-key-secret}
+    bucket-name: ${sky.alioss.bucket-name}

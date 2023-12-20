@@ -30,7 +30,7 @@ public class Dish implements Serializable {
     //菜品价格
     private BigDecimal price;
 
-    //图片
+    //图片, 这里似乎传入的是图床的访问地址
     private String image;
 
     //描述信息

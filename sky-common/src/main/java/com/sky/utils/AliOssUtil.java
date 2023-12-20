@@ -6,11 +6,13 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.io.ByteArrayInputStream;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Slf4j
 public class AliOssUtil {
 
@@ -52,7 +54,7 @@ public class AliOssUtil {
             }
         }
 
-        //文件访问路径规则 https://BucketName.Endpoint/ObjectName
+        //文件访问路径规则 https://BucketName.Endpoint/ObjectName, 图片的访问路径
         StringBuilder stringBuilder = new StringBuilder("https://");
         stringBuilder
                 .append(bucketName)
