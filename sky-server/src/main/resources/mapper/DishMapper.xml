@@ -8,4 +8,20 @@
         insert into dish(name, category_id, price, image, description, status, create_time, update_time, create_user, update_user) values
         (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
     </insert>
+
+    <select id="pageQuery" resultType="com.sky.vo.DishVO">
+        select d.*, c.name as categoryName from dish d left outer join category c on d.category_id = c.id
+        <where><!--通过where标签动态将相关的查询语句进行拼接-->
+            <if test="name != null">
+                and d.name like concat('%',#{name},'%')<!--名称的相关查询一般情况下使用like模糊查询进行查询, 如果是直接使用=进行精准匹配也是可以-->
+            </if>
+            <if test="categoryId != null">
+                and d.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and d.status = #{status}
+            </if>
+        </where>
+        order by d.create_time desc
+    </select>
 </mapper>

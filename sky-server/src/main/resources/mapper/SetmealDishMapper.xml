@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.SetmealDishMapper">
+
+    <!--动态sql使用foreach遍历集合, 将集合中的所有元素使用','进行间隔并使用open和close属性进行标注遍历前和遍历后, 另外item属性中的取值需要和#{}表达式中的一致-->
+    <select id="getSetmealIdsByDishIds" resultType="java.lang.Long">
+        select setmeal_id from setmeal_dish where dish_id in
+        <foreach collection="dishIds" item="dishId" separator="," open="(" close=")"><!--表示开始遍历前加上左括号, 遍历后加上右括号-->
+            #{dishId}
+        </foreach>
+    </select>
+</mapper>
