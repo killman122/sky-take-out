@@ -8,6 +8,6 @@ sky:
     password: wjr107024
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5tLhJUkNNF3akkU6G4Sn
-    access-key-secret: ZLQdB0ZldWdw4yrfNNdS7nWiMNfqsY
+    access-key-id: 
+    access-key-secret: 
     bucket-name: wangsansi
