@@ -55,4 +55,13 @@ public interface DishMapper {
     @Delete("delete from dish where id = #{id}")
     void deleteById(Long id);
 
+    /**
+     * 修改菜品表中的基本信息
+     * 通过传入的dish对象中的id属性进行修改
+     * 动态的进行修改, 只有当dish对象中的属性有值, 并且属性的值不为null, 才能进行修改
+     * 使用@AutoFill自定义注解填充公共属性, 但是之前的都是写在Controller层中的, 这里是写在Mapper层中的, 所以需要在自定义注解中添加一个属性, 用于标识是哪一层的注解
+     * @param dish
+     */
+    @AutoFill(value = OperationType.UPDATE)
+    void update(Dish dish);
 }

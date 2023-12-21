@@ -13,13 +13,17 @@ import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
+import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -64,7 +68,7 @@ public class DishServiceImpl implements DishService {
         List<DishFlavor> flavors = dishDTO.getFlavors();//获取DTO中的口味集合中的数据, 使用lombok中的@Data注解可以自动生成get和set方法, 从而可以直接使用get方法获取属性值
         if (flavors != null && flavors.size() > 0) {//说明口味数据不为空,单例集合中的size()方法获取集合中的数据元素个数也就是长度
             //方式1:通过遍历集合的方式向口味表中插入数据
-            for (DishFlavor flavor : flavors) {
+            for (DishFlavor flavor : flavors) {//这里也可以使用foreach循环, 但是需要注意的是, 如果使用foreach循环, 则需要在循环体中进行设置菜品id, 否则会出现空指针异常
                 flavor.setDishId(dishId);//设置菜品id
 //                dishFlavorMapper.insertBatch(flavor);//向口味表中插入数据, 可以选择一次加入, 但是需要在mapper中写出单个插入的方法
             }
@@ -90,6 +94,7 @@ public class DishServiceImpl implements DishService {
     /**
      * 菜品批量删除
      * 使用事务注解@Transactional进行事务管理, 如果有对于多个数据表的操作, 需要保证事务的一致性
+     *
      * @param ids
      */
     @Transactional
@@ -117,5 +122,57 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.deleteByDishId(id);
         }
 
+    }
+
+    /**
+     * 根据id查询菜品和对应的口味数据
+     * 先查询菜品表获取所有的菜品属性并封装到VO对象中, 再查询口味表获取所有的口味属性并封装到VO对象中, 最后将两个VO对象进行合并
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+        //根据id查询菜品数据
+        Dish dish = dishMapper.getById(id);
+
+        //根据菜品id查询口味数据
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
+
+        //将查询到的数据封装到VO对象中
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);//将菜品表中的数据拷贝到VO对象中
+        dishVO.setFlavors(dishFlavors);//将口味表中的数据封装到VO对象中
+
+        return dishVO;
+    }
+
+    /**
+     * 根据id修改菜品信息和对应的口味
+     * 在修改的时候需要对菜品表和口味表两张表中的数据进行修改
+     * 对于口味的修改比较麻烦, 但是可以将原先的口味进行删除, 再将前端传输过来新的口味进行添加, 统一进行口味的处理
+     *
+     * @param dishDTO
+     */
+    @Override
+    public void updateWithFlavor(DishDTO dishDTO) {
+        //修改菜品表中的基本信息(不包括口味), 需要传入基本的菜品对象dish, 如果是将dishDTO进行传入则是将所有的属性都传入, 但是这里只需要传入部分属性, 所以需要将dishDTO中的部分属性拷贝到dish对象中
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        dishMapper.update(dish);
+
+        //删除原有的口味数据
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+
+        //重新批量插入新的口味数据
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        if (flavors != null && flavors.size() > 0) {//说明口味数据不为空,单例集合中的size()方法获取集合中的数据元素个数也就是长度
+            //通过foreach遍历集合的方式向口味表中插入数据
+            flavors.forEach(flavor -> {
+                flavor.setDishId(dishDTO.getId());//设置菜品id
+            });
+            //通过直接将集合对象传入的方式向口味表中批量插入数据
+            dishFlavorMapper.insertBatch(flavors);
+        }
     }
 }
