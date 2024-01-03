@@ -43,7 +43,7 @@ public class EmployeeController {
     @PostMapping("/login")
     @ApiOperation(value = "员工登录", notes = "员工登录")
     //使用swagger的注解@ApiOperation，表示这个方法是一个swagger的配置方法, 传入的参数value属性表示当前方法的作用, notes属性表示当前方法的备注说明
-    public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
+    public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {//这里使用@RequestBody表示通过请求体以json的格式提交数据
         log.info("员工登录：{}", employeeLoginDTO);
 
         Employee employee = employeeService.login(employeeLoginDTO);//在调用login的时候, 实质是调用的实现类中的login方法

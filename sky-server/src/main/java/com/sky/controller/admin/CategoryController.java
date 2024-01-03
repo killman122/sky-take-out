@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * 分类管理
+ * 这里的别名默认情况下是类名的小驼峰形式的写法
  */
 @RestController
 @RequestMapping("/admin/category")
