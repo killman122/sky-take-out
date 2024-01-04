@@ -8,7 +8,9 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.exception.DishStopFailedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
@@ -179,6 +181,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 条件查询菜品和口味
+     *
      * @param dish
      * @return
      */
@@ -189,7 +192,7 @@ public class DishServiceImpl implements DishService {
 
         for (Dish d : dishList) {
             DishVO dishVO = new DishVO();
-            BeanUtils.copyProperties(d,dishVO);
+            BeanUtils.copyProperties(d, dishVO);
 
             //根据菜品id查询对应的口味
             List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
@@ -199,5 +202,29 @@ public class DishServiceImpl implements DishService {
         }
 
         return dishVOList;
+    }
+
+    @Override
+    public List<Dish> list(Long categoryId) {
+        return null;
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        //被套餐关联的菜品不能被停售---通过菜品id查setmeal_dish表
+        SetmealDish setmealDish = setmealDishMapper.getSetmealDishByDishId(id);
+
+        if (setmealDish != null) {
+            //菜品被套餐关联，不能被停售
+            throw new DishStopFailedException(MessageConstant.DISH_BE_STOPED_BY_SETMEAL);
+        }
+
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        dishMapper.update(dish);
+
     }
 }
