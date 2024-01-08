@@ -17,7 +17,7 @@
 		{
 			"enabled":true,
 			"type":"token",
-			"value":"eyJhbGciOiJIUzI1NiJ9.eyJlbXBJZCI6MSwiZXhwIjoxNzA0MzQ2MDY4fQ.2Mw1xpvBIBFBDMVLe-CWc3wwEq_v70YUE6sEDwcA5SY"
+			"value":"eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MDQ2NDE5MTQsInVzZXJJZCI6NH0.x1P-RQkqiVlN56OtuPdkeTP6zWx51kc_-vWKpnzmMDs"
 		}
 	],
 	"maxDescriptionLength":-1,
