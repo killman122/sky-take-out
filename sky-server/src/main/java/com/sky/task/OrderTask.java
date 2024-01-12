@@ -24,7 +24,7 @@ public class OrderTask {
     /**
      * 处理超时订单的方法
      */
-    @Scheduled(cron = "0 * * * * ?")//每分钟触发一次
+//    @Scheduled(cron = "0 * * * * ?")//每分钟触发一次
     public void procesTimeOutOrder() {
         log.info("定时处理超时订单:{}", LocalDateTime.now());
         // select * from orders where status = ? and order_time(下单时间) < (当前时间 - 15)
@@ -54,7 +54,7 @@ public class OrderTask {
                 });
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")//每天凌晨一点触发一次
+//    @Scheduled(cron = "0 0 1 * * ?")//每天凌晨一点触发一次
     public void processDeliveryOrder(){
         log.info("定时处理派送中的订单:{}", LocalDateTime.now());
         //查询出所有派送中的订单, 并且订单的派送时间小于当前时间减去1小时的订单, 然后将订单状态修改为已完成

@@ -35,14 +35,6 @@ public interface OrderMapper {
     void update(Orders orders);
 
     /**
-     * 用户订单数据查询
-     *
-     * @param ordersPageQueryDTO
-     * @return
-     */
-    Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
-
-    /**
      * 根据订单id查询订单对象
      *
      * @param id
@@ -85,5 +77,11 @@ public interface OrderMapper {
     @Select("select * from orders where  status=#{status} and order_time<#{orderTime}")
     List<Orders> getByStatusAndOrderTimeLT(@Param("status") Integer status, @Param("orderTime") LocalDateTime orderTime);
 
+    /**
+     * 分页条件查询并按下单时间排序
+     *
+     * @param ordersPageQueryDTO
+     */
+    Page<Orders> pageQuery(@Param("ordersPageQueryDTO") OrdersPageQueryDTO ordersPageQueryDTO);
 
 }
