@@ -5,15 +5,20 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkspaceService;
+import com.sky.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +38,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WorkspaceService workspaceService;
 
     /**
      * 统计指定时间区域间内的营业额数据
@@ -255,5 +262,70 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(nameList)
                 .numberList(numberList)
                 .build();
+    }
+
+    /**
+     * 导出运营数据报表
+     *
+     * @param response
+     */
+    @Override
+    public void exportBusinessData(HttpServletResponse response) {
+        //1. 查詢數據庫,获取营业数据---查询最近30天的运营数据
+        //获取当天的时间
+        LocalDate now = LocalDate.now();
+        //获取30天之前的时间
+        LocalDate dateBegin = now.minusDays(30);
+        //获取昨天的时间
+        LocalDate dateEnd = LocalDate.now().minusDays(1);
+        LocalDateTime begin = LocalDateTime.of(dateBegin, LocalTime.MIN);//将LocalDate 相关的日期数据加上组合变为LocalDateTime的日期时间类型数据
+        LocalDateTime end = LocalDateTime.of(dateEnd, LocalTime.MAX);
+
+        //查询概览数据
+        BusinessDataVO businessDataVO = workspaceService.getBusinessData(begin, end);
+
+        //2. 通过poi将数据写入到Excel文件中
+        Class<? extends ReportServiceImpl> aClass = this.getClass();//获取类对象
+        ClassLoader classLoader = aClass.getClassLoader();//获取类加载器
+        InputStream resourceAsStream = classLoader.getResourceAsStream("template/运营数据报表模板.xlsx");
+
+        try {
+            //基于模板文件创建一个新的Excel文件, 这里可以传入输入流或者文件路径作为参数
+            XSSFWorkbook excel = new XSSFWorkbook("D:\\SkyTakeout\\sky-take-out\\sky-server\\src\\main\\resources\\template\\运营数据报表模板.xlsx");
+
+            //获取sheet标签页
+            XSSFSheet sheet = excel.getSheetAt(0);
+            //获取第二行
+            XSSFRow row = sheet.getRow(1);
+            //获取第二个单元格,并设置值
+            row.getCell(1).setCellValue("时间:"+dateBegin+"至"+dateEnd);
+
+            //填充明细数据
+            for (int i = 0; i < 30; i++) {
+                LocalDate dateTime = dateBegin.plusDays(i);
+                //查询某一天的营业数据, 在每一次的查询后获取的是不同的VO对象, 否则会出现查询同一天数据的情况
+                businessDataVO = workspaceService.getBusinessData(LocalDateTime.of(dateTime, LocalTime.MIN), LocalDateTime.of(dateTime, LocalTime.MAX));
+                //获取第八行到之后的每行数据
+                row = sheet.getRow(7 + i);
+                row.getCell(1).setCellValue(dateTime.toString());
+                row.getCell(2).setCellValue(businessDataVO.getTurnover());
+                row.getCell(3).setCellValue(businessDataVO.getValidOrderCount());
+                row.getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());
+                row.getCell(5).setCellValue(businessDataVO.getUnitPrice());
+                row.getCell(6).setCellValue(businessDataVO.getNewUsers());
+            }
+
+            //3. 通过输出流将Excel文件下载到客户端浏览器中
+            ServletOutputStream outputStream = response.getOutputStream();
+            excel.write(outputStream);
+
+            //关闭资源
+            outputStream.close();
+            excel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        /*在这个修改后的版本中，我将查询每天的营业数据的代码移动到了循环内部，并将查询到的数据赋值给了`businessDataVO`。然后，我使用这个`businessDataVO`来填充Excel的每一行。这样，每一行的数据就会根据每天的数据进行变化了。*/
+
     }
 }
